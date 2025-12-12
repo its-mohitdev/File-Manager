@@ -93,6 +93,7 @@ async function menu() {
         const icon = item.type === "folder" ? "📂" : "🗄️";
         console.log(`${icon} ${chalk.yellow(item.name)} \n${item.path}`);
       });
+      break;
 
     case "7":
       rl.close();
