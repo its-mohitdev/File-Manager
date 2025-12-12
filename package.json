@@ -1,0 +1,10 @@
+{
+  "name": "fman",
+  "type": "module",
+  "bin": {
+    "fman": "fileManager.js"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2"
+  }
+}

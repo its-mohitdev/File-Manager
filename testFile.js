@@ -1,39 +1,66 @@
 import {log} from "node:console";
 import {Stats} from "node:fs";
 import * as fs from "node:fs/promises";
+import path from "node:path";
 // import * as fs from 'node:fs';
 
 const name = process.argv;
-const date = new Date().getHours();
 // console.log(name);
-// coole.log(date);
 
-//creating file using write api
-// function createFile(pathname){
-//     //sync
-//     // fs.writeFileSync(pathname,"hello node js!\n")
-//     // fs.appendFileSync(pathname,"hello js!")
+export async function deleteFile(filePath) {
+  await fs.unlink(filePath);
+}
 
-//     //async
-//     //error first callback
-//     fs.writeFile(pathname ,"helloooo\n" , (err)=>{
-//         if(err){
-//             console.log("Something went wrong while creating file");
-//             return;
-//         }
-//        console.log("Task compelete");
-//     })
+export async function listItems(itemPath) {
+  const items = await fs.readdir(itemPath, {withFileTypes: true});
+  return items.map((item) => {
+    return {
+      name: item.name,
+      type: item.isDirectory() ? "folder" : "file",
+      path : path.join(import.meta.dirname , item.name)
+    };
+  });
+}
+listItems("./");
 
-//     fs.appendFile(pathname,"append",(err)=>{
-//           if(err){
-//             console.log("Something went wrong while creating file");
-//             return;
-//         }
-//     })
-//     console.log("File has been created");
-// }
+export async function createFile(fileName, content = "") {
+  await fs.writeFile(fileName, content);
+}
 
-//using Asyn/await - avoids callback hell
+export async function createFolder(folderName) {
+  await fs.mkdir(folderName, {recursive: true});
+}
+// createFolder();
+
+export async function deleteFolder(pathname) {
+  try {
+    await fs.rm(pathname, {recursive: true, force: true});
+  } catch (error) {
+    console.log(error);
+  }
+}
+// deleteFolder("./nodejs/hello.txt")
+
+export async function writeToFile(filePath, content = " ") {
+  await fs.appendFile(filePath, content);
+}
+
+//stat  cmd -- to get the file data
+async function getFileInfo(filePath) {
+  const stats = await fs.stat(filePath);
+
+  return {
+    size: `${(stats.size / 1024).toFixed(2)} KB`,
+    created: stats.birthtime.toLocaleString(),
+    modified: stats.mtime.toLocaleString(),
+  };
+}
+
+//  getFileInfo("./hello.txt").then(data =>{
+//     console.log(data);
+// })
+
+// using Asyn/await - avoids callback hell
 // async function createFile(pathname) {
 //   try {
 //     await fs.writeFile(pathname, "Hello nodejs\n");
@@ -42,45 +69,34 @@ const date = new Date().getHours();
 //     console.log(error, "Error");
 //   }
 
-  //Better approch to write code in the production
-  //It waits until the line 11 executes completly (but remember its all happening asynchronsouly)
-  // Handle error using try catch.
-  // Confusion -- You think that code is running sycnc as it runs line by line but its not blocking main thread it suspends(executes) each line
+//Better approch to write code in the production
+//It waits until the line 11 executes completly (but remember its all happening asynchronsouly)
+// Handle error using try catch.
+// Confusion -- You think that code is running sycnc as it runs line by line but its not blocking main thread it suspends(executes) each line
 // }
+
 // createFile("./hello.txt")
 
-//create file
-export async function createFile(fileName,content = ''){
-  await fs.writeFile(fileName, content)
-}
+// function createFile(pathname) {
+//   //sync
+//   fs.writeFileSync(pathname,"hello node js!\n")
+//   fs.appendFileSync(pathname,"hello js!")
 
-//create folder
-export async function createFolder(folderName) {
-  await fs.mkdir(folderName, {recursive: true});
-}
-// createFolder();
+//   //async
+//   //error first callback
+//   fs.writeFile(pathname, "helloooo\n", (err) => {
+//     if (err) {
+//       console.log("Something went wrong while creating file");
+//       return;
+//     }
+//     console.log("Task compelete");
+//   });
 
-//delete cmd
-async function deleteFolder(pathname) {
-  try {
-    await fs.rm(pathname);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// deleteFolder("./nodejs/hello.txt")
-
-//stat  cmd -- to get the file data
-// async function getFileInfo(filePath) {
-//    const stats = await fs.stat(filePath)
-
-//    return {
-//     size : `${(stats.size/1024).toFixed(2)} KB`,
-//     created : stats.birthtime.toLocaleString(),
-//     modified: stats.mtime.toLocaleString()
-//    }
+//   fs.appendFile(pathname, "append", (err) => {
+//     if (err) {
+//       console.log("Something went wrong while creating file");
+//       return;
+//     }
+//   });
+//   console.log("File has been created");
 // }
-//  getFileInfo("./hello.txt").then(data =>{
-//     console.log(data);
-// })
